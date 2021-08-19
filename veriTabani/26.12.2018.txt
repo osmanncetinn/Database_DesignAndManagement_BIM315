@@ -1,0 +1,96 @@
+/*1*/
+CREATE FUNCTION fnEmpManager(@employee_id int)
+RETURNS varchar(50)
+AS
+BEGIN
+DECLARE @manager_name varchar(50)
+SET @manager_name = (SELECT employee_firstname FROM migros_employees WHERE employee_id IN (SELECT employee_supervisor_id FROM migros_employees WHERE employee_id=@employee_id))
+RETURN(@manager_name)
+END
+
+DECLARE @employee_id int
+SET @employee_id=1
+SELECT dbo.fnEmpManager(@employee_id)
+
+SELECT dbo.fnEmpManager(1)
+
+/*2*/
+CREATE FUNCTION fnDayToBirthDate1(@employee_id int)
+RETURNS int
+AS
+BEGIN
+DECLARE @id int
+SET @id = 
+(
+SELECT --employee_birthdate, GETDATE(),
+       --DATEDIFF(YEAR, employee_birthdate, GETDATE()),
+	   365-DATEDIFF(DAY, 
+	   DATEADD(YEAR,DATEDIFF(YEAR, employee_birthdate, GETDATE()), employee_birthdate), 
+	   GETDATE())
+FROM migros_employees
+WHERE employee_id=@employee_id
+)
+RETURN(@id)
+END
+
+DECLARE @employee_id int
+SET @employee_id=1
+SELECT dbo.fnDayToBirthDate1(@employee_id)
+
+SELECT dbo.fnDayToBirthDate1(1)
+
+SELECT employee_firstname,employee_birthdate,dbo.fnDayToBirthDate1(employee_id) FROM migros_employees
+
+/*3*/
+CREATE VIEW vwVendorProducts AS
+SELECT mv.vendor_name, mp.product_name, mp.product_retail_price FROM migros_products mp
+INNER JOIN migros_vendors mv ON mp.product_vendor_id=mv.vendor_id
+
+SELECT * FROM vwVendorProducts
+
+/*4*/
+CREATE FUNCTION fnReturnVendorAvgPrice(@isim varchar(30))
+RETURNS float
+AS
+BEGIN
+DECLARE @girilen varchar(30)
+SET @girilen = 
+(
+SELECT AVG(mp.product_retail_price) FROM migros_products mp
+INNER JOIN migros_vendors mv ON mp.product_vendor_id=mv.vendor_id
+WHERE vendor_name=@isim
+GROUP BY vendor_name
+)
+RETURN(@girilen)
+END
+
+SELECT dbo.fnReturnVendorAvgPrice('Mikey')
+
+--
+
+CREATE FUNCTION fnReturnVendorAvgPrice1(@product_id int)
+RETURNS float
+AS
+BEGIN
+DECLARE @giris int
+SET @giris = 
+(
+SELECT AVG(mp.product_retail_price) FROM migros_products mp
+WHERE product_vendor_id=@product_id
+)
+RETURN(@giris)
+END
+
+SELECT dbo.fnReturnVendorAvgPrice1(2)
+
+/*5*/
+CREATE VIEW vwListManagers AS
+SELECT * FROM migros_employees
+WHERE employee_id IN (SELECT employee_supervisor_id FROM migros_employees)
+
+SELECT * FROM vwListManagers
+
+/*6*/
+SELECT * FROM migros_products mp
+INNER JOIN migros_vendors mv ON mp.product_vendor_id=mv.vendor_id
+WHERE product_department = 'Electronics' OR product_department = 'Hardware' 

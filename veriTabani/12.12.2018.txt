@@ -1,0 +1,87 @@
+/*
+create table Purchase (pid int primary key,  product varchar(20),  price float,  quantity int,  month varchar(15));
+
+insert into Purchase values(01,'bagel',  1.99, 20, 'september');
+insert into Purchase values(02,'bagel',  2.50, 12, 'december');
+insert into Purchase values(03,'banana', 0.99, 9, 'september');
+insert into Purchase values(04,'banana', 1.59, 9, 'february');
+insert into Purchase values(05,'gizmo', 99.99, 5, 'february');
+insert into Purchase values(06,'gizmo', 99.99, 3, 'march');
+insert into Purchase values(07,'gizmo', 49.99, 3, 'april');
+insert into Purchase values(08,'gadget',89.99, 3, 'january');
+insert into Purchase values(09,'gadget',89.99, 3, 'february');
+insert into Purchase values(10,'gadget',49.99, 3, 'march');
+
+create table Product (pid int primary key, pname varchar(20), manufacturer varchar(50));
+
+insert into product values(1, 'bagel', 'Sunshine Co.');
+insert into product values(2, 'banana', 'BusyHands');
+insert into product values(3, 'gizmo', 'GizmoWorks');
+insert into product values(4, 'gadget', 'BusyHands');
+insert into product values(5, 'powerGizmo', 'PowerWorks');
+*/
+
+/*1
+SELECT DISTINCT x.month, (SELECT COUNT(*) FROM Purchase y WHERE x.month=y.month AND y.quantity>5) AS [Adet]
+FROM Purchase x
+WHERE x.quantity>5
+*/
+
+/*2
+SELECT month,COUNT(*) AS ADET FROM Purchase
+WHERE quantity>5
+GROUP BY month
+*/
+
+/*3.1
+SELECT x.product, SUM(x.price), y.manufacturer AS [Üretici]
+FROM Purchase x
+INNER JOIN Product y ON y.pname=x.product
+GROUP BY x.product,y.manufacturer
+*/
+
+/*3.2
+SELECT x.product, SUM(x.price) AS [TOPLAM], (SELECT y.manufacturer FROM Product y WHERE x.product=y.pname) AS [Üretici]
+FROM Purchase x
+GROUP BY x.product
+*/
+
+/*4
+CREATE PROCEDURE spReturnProducts1
+AS
+BEGIN
+SELECT x.product, SUM(x.price) AS [TOPLAM], (SELECT y.manufacturer FROM Product y WHERE x.product=y.pname) AS [Üretici]
+FROM Purchase x
+GROUP BY x.product;
+END
+
+
+EXEC spReturnProducts1;
+*/
+
+/*5
+CREATE PROCEDURE spInsertProduct1
+AS
+BEGIN
+INSERT INTO Product VALUES (7,'Portakal','Manav');
+END
+
+EXEC spInsertProduct1;
+*/
+
+/*5
+CREATE PROCEDURE spInsertProduct2 @pid int,@pname varchar(20),@manufacturer varchar(20)
+AS
+BEGIN
+INSERT INTO Product(pid, pname, manufacturer) VALUES (@pid, @pname, @manufacturer);
+END
+
+EXEC spInsertProduct2 8,'Recep','Ev'
+*/
+
+/*7.1
+SELECT x.product, SUM(x.price) AS [TOPLAM], SUM(x.quantity) AS [ADET], x.month
+FROM Purchase x
+WHERE x.price<50 AND x.quantity<15
+GROUP BY x.product,x.mont
+*/

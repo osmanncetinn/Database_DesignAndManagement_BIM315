@@ -1,0 +1,51 @@
+/*1*/
+CREATE PROC spReturnAllEmployee
+AS
+BEGIN
+SELECT * FROM migros_employees
+END
+
+EXEC spReturnAllEmployee;
+
+/*2*/
+CREATE PROC spReturnEmployeeByDepartment
+@departman varchar(20)
+AS
+BEGIN
+SELECT * FROM migros_employees
+WHERE employee_department=@departman
+END
+
+EXEC spReturnEmployeeByDepartment @departman = 'Electronics'
+
+/*3*/
+CREATE PROC spInsertVendor
+@vendor_name varchar(50), @vendor_phone varchar(20), @vendor_website varchar(20)
+AS
+BEGIN
+INSERT INTO migros_vendors (vendor_name, vendor_phone, vendor_website) VALUES (@vendor_name, @vendor_phone, @vendor_website);
+END
+
+EXEC spInsertVendor 'xxx','555-1234','www...com'
+
+/*4*/
+CREATE PROC spReturnVendorByProduct1
+@product_id int
+AS
+BEGIN
+SELECT product_id,vendor_id,vendor_name,vendor_phone,vendor_website FROM migros_products
+INNER JOIN migros_vendors ON migros_products.product_vendor_id=migros_vendors.vendor_id
+WHERE product_id=@product_id
+END
+
+EXEC spReturnVendorByProduct1 3
+
+/*5*/
+CREATE PROC spUpdateProduct
+@product_id int, @product_retail_price money, @product_wholesale_price money
+AS
+BEGIN
+UPDATE migros_products SET product_retail_price=@product_retail_price, product_wholesale_price=@product_wholesale_price WHERE product_id=@product_id
+END
+
+EXEC spUpdateProduct @product_retail_price=15, @product_wholesale_price=15, @product_id=51
